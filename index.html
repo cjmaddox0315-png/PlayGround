@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#101619" />
+  <title>CRUMPLE — Soft-body crash lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="game-shell">
+    <canvas id="game" aria-label="3D soft body car crash game"></canvas>
+    <div class="vignette"></div>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Crumple home"><span class="brand-mark">C</span><span>CRUMPLE<span class="brand-sub">IMPACT LAB</span></span></a>
+      <div class="top-center"><span class="live-dot"></span> SANDBOX <span class="top-divider">/</span> TEST FACILITY 04</div>
+      <button class="sound-button" id="soundButton" aria-label="Toggle sound"><span class="sound-icon">♪</span><span id="soundLabel">SOUND ON</span></button>
+    </header>
+    <section class="mission-card" id="missionCard">
+      <div class="eyebrow"><span class="eyebrow-line"></span> VEHICLE DESTRUCTION SIMULATOR</div>
+      <h1>BUILT TO<br><em>BREAK.</em></h1>
+      <p class="mission-copy">No two crashes are the same.<br>How far can you push the limits?</p>
+      <button class="start-button" id="startButton"><span>START TEST</span><span class="button-arrow">↗</span></button>
+      <div class="mission-foot"><span>01</span><span class="foot-line"></span><span>OPEN ROAD TRIAL</span></div>
+    </section>
+    <div class="hud hidden" id="hud">
+      <div class="speed-card"><div class="hud-label">VELOCITY <span>KM/H</span></div><div class="speed-row"><strong id="speedValue">000</strong><span class="speed-unit">KM/H</span></div><div class="speed-track"><i id="speedBar"></i></div></div>
+      <div class="damage-card"><div class="hud-label">VEHICLE INTEGRITY</div><div class="damage-row"><strong id="integrityValue">100</strong><span>%</span></div><div class="integrity-track"><i id="integrityBar"></i></div><div class="damage-caption" id="damageCaption">FACTORY FRESH</div></div>
+      <div class="impact-toast" id="impactToast"><span class="impact-icon">✳</span><div><b>IMPACT DETECTED</b><small id="impactText">BODY DEFORMATION</small></div><strong id="impactScore">+120</strong></div>
+    </div>
+    <div class="scoreboard hidden" id="scoreboard"><span>CRASH SCORE</span><strong id="scoreValue">000000</strong></div>
+    <div class="crash-message hidden" id="crashMessage"><span>TEST COMPLETE</span><b>THAT'S A<br><em>WRAP.</em></b><small>YOUR CAR HAS SEEN BETTER DAYS</small><button id="retryButton">RUN IT BACK <span>↻</span></button></div>
+    <div class="controls-hint" id="controlsHint"><span class="key">W</span><span class="key-stack"><i>A</i><i>S</i><i>D</i></span><span class="hint-copy">DRIVE</span><span class="hint-sep"></span><span class="key wide">SPACE</span><span class="hint-copy">HANDBRAKE</span></div>
+    <div class="mobile-controls" id="mobileControls"><button data-control="left">◀</button><button data-control="brake">▼</button><button data-control="right">▶</button><button data-control="gas">▲</button></div>
+    <div class="bottom-left"><span class="facility-dot"></span> NEVADA PROVING GROUNDS <span class="bottom-sep">•</span> 36°10'12.4"N</div>
+    <div class="bottom-right"><span>PHYSICS ENGINE</span><b>CRUMPLE<span>™</span></b><span class="bottom-sep">•</span><span id="fpsLabel">60 FPS</span></div>
+    <div class="loading" id="loading"><span class="loader"></span> PREPARING TEST FACILITY</div>
+  </main>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js"}}</script>
+  <script type="module" src="./game.js"></script>
+</body>
+</html>
