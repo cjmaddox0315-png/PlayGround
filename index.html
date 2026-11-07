@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./mobile-controls.css" />
 </head>
 <body>
   <main class="game-shell">
@@ -34,7 +35,17 @@
     <div class="scoreboard hidden" id="scoreboard"><span>CRASH SCORE</span><strong id="scoreValue">000000</strong></div>
     <div class="crash-message hidden" id="crashMessage"><span>TEST COMPLETE</span><b>THAT'S A<br><em>WRAP.</em></b><small>YOUR CAR HAS SEEN BETTER DAYS</small><button id="retryButton">RUN IT BACK <span>↻</span></button></div>
     <div class="controls-hint" id="controlsHint"><span class="key">W</span><span class="key-stack"><i>A</i><i>S</i><i>D</i></span><span class="hint-copy">DRIVE</span><span class="hint-sep"></span><span class="key wide">SPACE</span><span class="hint-copy">HANDBRAKE</span></div>
-    <div class="mobile-controls" id="mobileControls"><button data-control="left">◀</button><button data-control="brake">▼</button><button data-control="right">▶</button><button data-control="gas">▲</button></div>
+    <div class="mobile-controls" id="mobileControls" aria-label="Touch driving controls">
+      <div class="touch-cluster steering-cluster" role="group" aria-label="Steering">
+        <button class="touch-button steer-button" type="button" data-control="left" aria-label="Steer left" aria-pressed="false"><span>◀</span><small>LEFT</small></button>
+        <button class="touch-button steer-button" type="button" data-control="right" aria-label="Steer right" aria-pressed="false"><span>▶</span><small>RIGHT</small></button>
+      </div>
+      <div class="touch-cluster pedal-cluster" role="group" aria-label="Speed controls">
+        <button class="touch-button brake-button" type="button" data-control="brake" aria-label="Brake and reverse" aria-pressed="false"><span>▼</span><small>BRAKE</small></button>
+        <button class="touch-button handbrake-button" type="button" data-control="handbrake" aria-label="Handbrake" aria-pressed="false"><span>◆</span><small>DRIFT</small></button>
+        <button class="touch-button gas-button" type="button" data-control="gas" aria-label="Accelerate" aria-pressed="false"><span>▲</span><small>GAS</small></button>
+      </div>
+    </div>
     <div class="bottom-left"><span class="facility-dot"></span> NEVADA PROVING GROUNDS <span class="bottom-sep">•</span> 36°10'12.4"N</div>
     <div class="bottom-right"><span>PHYSICS ENGINE</span><b>CRUMPLE<span>™</span></b><span class="bottom-sep">•</span><span id="fpsLabel">60 FPS</span></div>
     <div class="loading" id="loading"><span class="loader"></span> PREPARING TEST FACILITY</div>

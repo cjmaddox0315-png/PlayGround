@@ -125,7 +125,7 @@ for(let i=0;i<3;i++) box(.07,.1,.01,acidMat,bodyPivot,-.15+i*.15,.91,2.175);
 // Dynamics and game state.
 let speed=0, steer=0, score=0, integrity=100, started=false, crashed=false, shake=0, impactCooldown=0, runTime=0;
 const keys={};
-const controls={left:false,right:false,gas:false,brake:false};
+const controls={left:false,right:false,gas:false,brake:false,handbrake:false};
 const originalVertices=shell.geometry.attributes.position.array.slice();
 const impacts=[];
 const tempV=new THREE.Vector3();
@@ -159,15 +159,26 @@ function collide(obstacle){
   setIntegrity(integrity-hitAmount*(obstacle.kind==='barrier'?17:9));
   flashImpact(hitAmount,obstacle.kind); playImpactSound(hitAmount); shake=Math.min(.65,hitAmount*.42);
   speed=-speed*.25;
-  if(integrity<=0){crashed=true; document.querySelector('#crashMessage').classList.remove('hidden'); document.querySelector('#controlsHint').classList.add('hidden');}
+  if(integrity<=0){crashed=true; document.querySelector('#crashMessage').classList.remove('hidden'); document.querySelector('#controlsHint').classList.add('hidden');document.querySelector('#mobileControls').classList.remove('driving');for(const name of Object.keys(controls))controls[name]=false;}
 }
-function resetGame(){initAudio();speed=0;steer=0;score=0;integrity=100;started=true;crashed=false;runTime=0;vehicle.position.set(0,0,7);vehicle.rotation.set(0,0,0);bodyPivot.rotation.set(0,0,0);bodyPivot.scale.set(1,1,1);shell.geometry.attributes.position.array.set(originalVertices);shell.geometry.attributes.position.needsUpdate=true;shell.geometry.computeVertexNormals();hood.scale.set(1,1,1);cabin.scale.set(1,1,1);impacts.length=0;obstacles.forEach(o=>{o.active=true;o.mesh.visible=true;o.mesh.rotation.set(0,0,0)});setIntegrity(100);document.querySelector('#scoreValue').textContent='000000';document.querySelector('#crashMessage').classList.add('hidden');document.querySelector('#missionCard').classList.add('gone');document.querySelector('#hud').classList.remove('hidden');document.querySelector('#scoreboard').classList.remove('hidden');document.querySelector('#controlsHint').classList.remove('hidden');document.querySelector('#mobileControls').style.opacity='1';}
+function resetGame(){initAudio();speed=0;steer=0;score=0;integrity=100;started=true;crashed=false;runTime=0;for(const name of Object.keys(controls))controls[name]=false;document.querySelectorAll('.mobile-controls button').forEach(button=>{button.classList.remove('pressed');button.setAttribute('aria-pressed','false');});vehicle.position.set(0,0,7);vehicle.rotation.set(0,0,0);bodyPivot.rotation.set(0,0,0);bodyPivot.scale.set(1,1,1);shell.geometry.attributes.position.array.set(originalVertices);shell.geometry.attributes.position.needsUpdate=true;shell.geometry.computeVertexNormals();hood.scale.set(1,1,1);cabin.scale.set(1,1,1);impacts.length=0;obstacles.forEach(o=>{o.active=true;o.mesh.visible=true;o.mesh.rotation.set(0,0,0)});setIntegrity(100);document.querySelector('#scoreValue').textContent='000000';document.querySelector('#crashMessage').classList.add('hidden');document.querySelector('#missionCard').classList.add('gone');document.querySelector('#hud').classList.remove('hidden');document.querySelector('#scoreboard').classList.remove('hidden');document.querySelector('#controlsHint').classList.remove('hidden');document.querySelector('#mobileControls').classList.add('driving');}
 
 // Keyboard and touch controls.
 addEventListener('keydown',e=>{ if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault(); keys[e.key.toLowerCase()]=true; if((e.key==='Enter'||e.key===' ')&&!started)resetGame(); if(e.key.toLowerCase()==='r'&&started)resetGame(); });
 addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
 document.querySelector('#startButton').addEventListener('click',resetGame); document.querySelector('#retryButton').addEventListener('click',resetGame);
-for(const button of document.querySelectorAll('.mobile-controls button')){const name=button.dataset.control;button.addEventListener('pointerdown',e=>{e.preventDefault();controls[name]=true;button.setPointerCapture(e.pointerId)});for(const ev of ['pointerup','pointercancel','lostpointercapture'])button.addEventListener(ev,()=>controls[name]=false);}
+for(const button of document.querySelectorAll('.mobile-controls button')){
+  const name=button.dataset.control;
+  const release=()=>{controls[name]=false;button.classList.remove('pressed');button.setAttribute('aria-pressed','false');};
+  button.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    if(!started||crashed)return;
+    controls[name]=true;button.classList.add('pressed');button.setAttribute('aria-pressed','true');
+    try{button.setPointerCapture(e.pointerId);}catch{}
+  });
+  for(const ev of ['pointerup','pointercancel','lostpointercapture'])button.addEventListener(ev,release);
+}
+addEventListener('blur',()=>{for(const name of Object.keys(controls))controls[name]=false;document.querySelectorAll('.mobile-controls button').forEach(button=>{button.classList.remove('pressed');button.setAttribute('aria-pressed','false');});});
 let muted=false, audioContext=null, engineOscillator=null, engineOvertone=null, engineGain=null;
 function initAudio(){
   if(!audioContext){try{audioContext=new (window.AudioContext||window.webkitAudioContext)();engineOscillator=audioContext.createOscillator();engineOvertone=audioContext.createOscillator();engineGain=audioContext.createGain();const filter=audioContext.createBiquadFilter();engineOscillator.type='sawtooth';engineOscillator.frequency.value=38;engineOvertone.type='triangle';engineOvertone.frequency.value=76;filter.type='lowpass';filter.frequency.value=240;engineGain.gain.value=0;engineOscillator.connect(filter);engineOvertone.connect(filter);filter.connect(engineGain);engineGain.connect(audioContext.destination);engineOscillator.start();engineOvertone.start();}catch(e){audioContext=null;}}
@@ -181,7 +192,7 @@ const cameraTarget=new THREE.Vector3(),desiredCamera=new THREE.Vector3();
 function animate(){requestAnimationFrame(animate);const dt=Math.min(.035,clock.getDelta());elapsed+=dt;frames++;fpsTime+=dt;if(fpsTime>1){document.querySelector('#fpsLabel').textContent=Math.round(frames/fpsTime)+' FPS';fpsTime=0;frames=0;}
   if(started&&!crashed){
     runTime+=dt;
-    const gas=keys.w||keys.arrowup||controls.gas, braking=keys.s||keys.arrowdown||controls.brake, left=keys.a||keys.arrowleft||controls.left, right=keys.d||keys.arrowright||controls.right, handbrake=keys[' '];
+    const gas=keys.w||keys.arrowup||controls.gas, braking=keys.s||keys.arrowdown||controls.brake, left=keys.a||keys.arrowleft||controls.left, right=keys.d||keys.arrowright||controls.right, handbrake=keys[' ']||controls.handbrake;
     if(gas)speed=Math.min(34,speed+dt*11); else if(braking)speed=Math.max(-10,speed-dt*15); else speed*=Math.pow(.985,dt*60);
     if(handbrake)speed*=Math.pow(.94,dt*60);
     const steering=(right?1:0)-(left?1:0); steer=THREE.MathUtils.damp(steer,steering,5.5,dt);
